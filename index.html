@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>湯の道巡礼｜1619.5kmの旅</title>
+
+
+<style>
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 8px;   /* ← 20px が犯人。まず減らす */
+}
+
+
+h1 {
+  margin: 4px 0 8px 0;   /* 上下の余白をかなり削減 */
+  font-size: 20px;      /* 大きすぎない */
+  text-align: center;
+}
+
+
+.title {
+  text-align: center;
+  margin: 2px 0 4px;   /* ← ほぼ最小 */
+}
+
+
+.title img {
+  display: block;        /* ← ここが最重要（inline-block は使わない） */
+  margin: 0 auto;        /* 中央寄せ */
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+}
+
+
+
+
+/* ===== マップ ===== */
+.map-wrapper {
+position: relative;
+width: 100%;
+aspect-ratio: 1333 / 417;
+
+}
+
+.map {
+width: 100%;
+height: 100%;
+display: block;
+}
+
+/* ===== SVGルート ===== */
+svg {
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+}
+
+#progressPath {
+transition: stroke-dashoffset 0.8s ease-out;
+}
+
+/* ===== ピン ===== */
+.pin {
+position: absolute;
+transform: translate(-50%, -100%);
+pointer-events: none;
+}
+
+/* 赤ピン（pin.png）だけ小さい */
+.pin-small {
+width: 16px;
+opacity: 1;
+}
+
+/* ===== 赤ピンだけ操作可能にする ===== */
+.pin-small {
+  pointer-events: auto;
+}
+
+
+/* ===== 赤ピン案内（hover / tap） ===== */
+.pin-small::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.pin-small:hover::after,
+.pin-small:focus::after {
+  opacity: 1;
+}
+
+/* 道後・伊勢・フェリー・ゴール */
+.pin-large {
+width: 26px;
+opacity: 1;
+}
+
+/* 表示切り替え用 */
+.hidden {
+display: none;
+}
+
+/* ===== 操作 ===== */
+.controls {
+margin-top: 16px;
+}
+
+/* 距離入力欄を見やすく */
+#inputKm {
+  width: 120px;        /* 横は控えめ */
+  height: 40px;
+  font-size: 16px;
+  padding: 4px 6px;
+}
+
+.history {
+margin-top: 10px;
+font-size: 14px;
+}
+
+.history table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 8px;
+font-size: 14px;
+}
+
+.history th,
+.history td {
+border: 1px solid #ccc;
+padding: 4px 6px;
+text-align: left;
+}
+
+.history th {
+background: #f5f5f5;
+}
+
+.history th:first-child,
+.history td:first-child {
+text-align: center;
+}
+
+/* ===== 履歴：見出しは中央揃え ===== */
+.history th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.history td {
+vertical-align: middle;
+}
+
+.history button {
+padding: 2px 6px;
+font-size: 12px;
+cursor: pointer;
+}
+
+
+.milestone {
+  position: absolute;
+  width: 50px;
+  transform: translate(-50%, -120%);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  z-index: 20;
+}
+
+
+.milestone.active {
+  opacity: 1;
+}
+
+/* ===== milestone message ===== */
+.milestone-message {
+  position: absolute;
+  top: 70%;
+  right: 12px;
+  left: auto;
+  background: #ffe6ee;
+  padding: 14px 18px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  color: #000;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+  display: inline-block;
+  max-width: 90%;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+
+
+.milestone-message {
+  pointer-events: none;   /* ← 非表示時はクリックを邪魔しない */
+}
+
+.milestone-message.show {
+  pointer-events: auto;   /* ← 表示中だけ操作可能 */
+}
+
+
+.milestone-message.show {
+  opacity: 1;
+}
+
+/* ===== スマホ最適化 ===== */
+@media (max-width: 600px) {
+
+  /* 画面余白を消す → 地図を横いっぱいに */
+  body {
+    padding: 0;
+  }
+
+body {
+  overflow-x: hidden;
+}
+.map-wrapper {
+  width: 100vw;                 /* 画面幅いっぱい */
+  max-width: none;              /* PC用制限を解除 */
+  margin-left: 50%;
+  transform: translateX(-50%);  /* 完全中央寄せ */
+}
+
+  /* タイトルと地図の距離 */
+h1 {
+  margin: 16px 0;
+  text-align: center;
+}
+
+  /* milestone（食・名所） */
+  .milestone {
+    width: 28px;
+    transform: translate(-50%, -60%);
+  }
+
+  /* メッセージ */
+  .milestone-message {
+    top: 78%;
+    font-size: 13px;
+    padding: 12px 14px;
+  }
+
+  /* ===== 履歴テーブル ===== */
+  .history table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .history th:nth-child(1),
+  .history td:nth-child(1) {
+    width: 32px;
+    font-size: 11px;
+  }
+
+  .history th:nth-child(2),
+  .history td:nth-child(2) {
+    width: 70px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .history th:nth-child(3),
+  .history td:nth-child(3),
+  .history th:nth-child(4),
+  .history td:nth-child(4) {
+    width: 64px;
+    font-size: 11px;
+  }
+
+  /* 通過ポイント（縦に読む設計） */
+ .history th:nth-child(5),
+.history td:nth-child(5) {
+  width: auto;              /* ← 固定幅をやめる */
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;   /* ← 見切れ防止の決定打 */
+  vertical-align: top;
+}
+
+
+  /* 削除ボタン */
+  .history th:nth-child(6),
+  .history td:nth-child(6) {
+    width: 44px;
+  }
+
+  /* ===== ピンサイズ ===== */
+  .pin-small { width: 12px; }
+  img[src*="ship"] { width: 20px; }
+  .pin-start,
+  .pin-goal,
+  img[src*="ise"] { width: 24px; }
+
+  /* ===== スマホ：メッセージ微調整 ===== */
+   .milestone-message {
+    top: 80%;
+    font-size: 13px;
+    padding: 12px 16px;
+  }
+
+
+#inputKm {
+  width: 120px;
+  height: 44px;
+  font-size: 18px;
+}
+
+#addBtn {
+  font-size: 16px;
+  padding: 8px 12px;
+}
+
+} /* ← ★ @media はここで終了 */
+
+
+
+/* ===== 履歴：数値列（距離・合計） ===== */
+.history td:nth-child(3),
+.history td:nth-child(4) {
+  text-align: right;
+  font-size: 16px;                 /* ← 数字を大きく */
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* 未達：半透明（案内はCSSで出さないだけ） */
+.pin-small.is-not-reached {
+  opacity: 0.35;
+}
+
+/* 到達：不透明 */
+.pin-small.is-reached {
+  opacity: 1;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="title">
+  <img src="title.png" alt="湯の道巡礼 1619.5kmの旅">
+</div>
+
+
+<div class="map-wrapper">
+
+<img src="map.png" class="map" alt="地図">
+
+<svg viewBox="0 0 1333 417" xmlns="http://www.w3.org/2000/svg">
+<!-- グレールート（dを貼る） -->
+<path
+d="m 445.82468,231.88404 -38.64734,31.74603 -67.63285,38.64734 -42.78812,2.76053 -6.90132,15.18288 -70.39337,6.90131 -66.25258,-70.39337
+v -9.66183
+L 59.351273,248.44719 6.9013108,209.79985 45.548651,176.67356
+h 64.872319
+l 19.32367,-69.01311 24.84472,1.38026 27.60525,6.90131
+v 28.98551
+l 9.66183,19.32367 31.74603,11.0421 22.0842,8.28157 30.36576,2.76052 19.32367,-5.52105 16.56315,-16.56314 11.0421,-8.28158 17.9434,-5.52104 9.66184,-15.18289 19.32367,-13.80262 27.60524,-5.52105 31.74603,4.14079 24.84472,6.90131 15.18289,11.0421 13.80262,5.52105 9.66183,-2.76053 26.22498,-15.18288 11.0421,-2.76053 17.94341,-5.52105 15.18288,-9.66183 15.18289,-5.52105 24.84472,-1.38026 12.42236,-2.760526 6.90131,-12.42236 13.80262,-11.042097 15.18288,-12.42236 27.60525,1.380263 97.99861,1.380262 89.71704,-2.760525 12.42236,9.661836 20.70393,9.661835 26.22498,6.901311 34.50656,-4.140787 12.42236,11.042097 20.70393,6.901311 22.08424,-17.943408 23.4644,-1.380262 16.5632,8.281573 30.3657,-12.42236 37.2671,-17.943408 26.225,23.464457 33.1263,12.42236 23.4644,11.042098 16.5632,22.08419 11.0421,24.84472 20.7039,33.12629 11.0421,9.66184 30.3658,4.14079 15.1829,1.38026 5.521,20.70393 -4.1408,12.42236 -8.2816,9.66184 -19.3236,2.76052
+h -40.0276
+v -16.56315
+l -16.5632,-2.76052 -16.5631,23.46446 -19.3237,6.90131 -49.6894,-56.59075 -1.3803,-19.32367 -28.9855,31.74603 -5.521,6.90131
+h -30.3658
+l -20.7039,15.18288 -35.8869,4.14079 -13.8026,-20.70393 -51.06968,-1.38027 -9.66184,9.66184
+h -92.47756
+l -5.52105,8.28157 -41.40787,2.76053 -15.18288,-22.0842 -9.66183,8.28158 -16.56315,20.70393 -8.28157,5.52105 -13.80262,-4.14079 -38.64735,-45.54865 -35.88681,-11.0421 -24.84472,-35.88682
+h -11.0421
+l -8.28157,9.66184 -4.14079,42.78813 2.76053,20.70393 -9.66184,20.70393 -13.80262,12.42236 -20.70393,-11.0421 -8.28158,-13.80262 -53.83022,2.76053 -30.36577,-4.14079 -8.28157,12.42236 -22.0842,-1.38026 -9.66183,-15.18289"
+fill="none"
+stroke="#6e6d6d"
+stroke-width="10"
+stroke-linecap="round"
+stroke-linejoin="round"
+/>
+
+<!-- 黄色ルート（同じ d を貼る） -->
+<path
+id="progressPath"
+d="m 445.82468,231.88404 -38.64734,31.74603 -67.63285,38.64734 -42.78812,2.76053 -6.90132,15.18288 -70.39337,6.90131 -66.25258,-70.39337
+v -9.66183
+L 59.351273,248.44719 6.9013108,209.79985 45.548651,176.67356
+h 64.872319
+l 19.32367,-69.01311 24.84472,1.38026 27.60525,6.90131
+v 28.98551
+l 9.66183,19.32367 31.74603,11.0421 22.0842,8.28157 30.36576,2.76052 19.32367,-5.52105 16.56315,-16.56314 11.0421,-8.28158 17.9434,-5.52104 9.66184,-15.18289 19.32367,-13.80262 27.60524,-5.52105 31.74603,4.14079 24.84472,6.90131 15.18289,11.0421 13.80262,5.52105 9.66183,-2.76053 26.22498,-15.18288 11.0421,-2.76053 17.94341,-5.52105 15.18288,-9.66183 15.18289,-5.52105 24.84472,-1.38026 12.42236,-2.760526 6.90131,-12.42236 13.80262,-11.042097 15.18288,-12.42236 27.60525,1.380263 97.99861,1.380262 89.71704,-2.760525 12.42236,9.661836 20.70393,9.661835 26.22498,6.901311 34.50656,-4.140787 12.42236,11.042097 20.70393,6.901311 22.08424,-17.943408 23.4644,-1.380262 16.5632,8.281573 30.3657,-12.42236 37.2671,-17.943408 26.225,23.464457 33.1263,12.42236 23.4644,11.042098 16.5632,22.08419 11.0421,24.84472 20.7039,33.12629 11.0421,9.66184 30.3658,4.14079 15.1829,1.38026 5.521,20.70393 -4.1408,12.42236 -8.2816,9.66184 -19.3236,2.76052
+h -40.0276
+v -16.56315
+l -16.5632,-2.76052 -16.5631,23.46446 -19.3237,6.90131 -49.6894,-56.59075 -1.3803,-19.32367 -28.9855,31.74603 -5.521,6.90131
+h -30.3658
+l -20.7039,15.18288 -35.8869,4.14079 -13.8026,-20.70393 -51.06968,-1.38027 -9.66184,9.66184
+h -92.47756
+l -5.52105,8.28157 -41.40787,2.76053 -15.18288,-22.0842 -9.66183,8.28158 -16.56315,20.70393 -8.28157,5.52105 -13.80262,-4.14079 -38.64735,-45.54865 -35.88681,-11.0421 -24.84472,-35.88682
+h -11.0421
+l -8.28157,9.66184 -4.14079,42.78813 2.76053,20.70393 -9.66184,20.70393 -13.80262,12.42236 -20.70393,-11.0421 -8.28158,-13.80262 -53.83022,2.76053 -30.36577,-4.14079 -8.28157,12.42236 -22.0842,-1.38026 -9.66183,-15.18289"
+fill="none"
+stroke="#fabc02"
+stroke-width="14"
+stroke-linecap="round"
+stroke-linejoin="round"
+/>
+</svg>
+
+
+<div id="milestoneMessage" class="milestone-message"></div>
+
+<!-- 道後温泉：スタート -->
+<img src="onsen.png"
+class="pin pin-start"
+style="left:33.30%; top:56.55%;">
+
+<!-- 道後温泉：ゴール -->
+<img src="goal.png"
+class="pin pin-goal hidden"
+style="left:33.30%; top:56.55%;">
+
+</div>
+
+<div class="controls">
+<input
+  type="number"
+  id="inputKm"
+  step="0.01"
+  placeholder="歩いた距離/km"
+>
+
+<button id="addBtn">追加</button>
+</div>
+
+<div class="history">
+<strong>履歴</strong>
+<table id="historyTable">
+
+<thead>
+<tr>
+  <th>No</th>
+  <th>日付</th>
+  <th>距離 (km)</th>
+  <th>合計 (km)</th>
+  <th>通過ポイント</th>
+  <th>削除</th>
+</tr>
+</thead>
+
+
+<tbody>
+</tbody>
+</table>
+</div>
+
+<script>
+
+const points = [
+  { name: "佐賀関港", x: 19.20, y: 82.91, icon: "ship.png", km: 80 },
+  { name: "想夫恋", x: 12.20, y: 65.98, icon: "pin.png", km: 160 },
+  { name: "太宰府天満宮", x: 3.10, y: 57.51, icon: "pin.png", km: 240 },
+  { name: "焼きカレー（門司港）", x: 8.10, y: 41.53, icon: "pin.png", km: 320 },
+  { name: "明石海峡大橋塔頂体験", x: 69.20, y: 21.41, icon: "pin.png", km: 800 },
+  { name: "信楽焼陶芸センター", x: 88.10, y: 20.77, icon: "pin.png", km: 960 },
+  { name: "松阪牛", x: 92.60, y: 41.53, icon: "pin.png", km: 1020 },
+  { name: "伊勢神宮", x: 96.20, y: 49.84, icon: "ise.png" },
+  { name: "志摩地中海村（宿泊）", x: 97.00, y: 62.30, icon: "pin.png", km: 1100 },
+  { name: "猟師の天然ジビエ いとう", x: 91.20, y: 59.11, icon: "pin.png", km: 1160 },
+  { name: "柿の葉すし", x: 80.10, y: 54.31, icon: "pin.png", km: 1280 },
+  { name: "高野山奥之院", x: 77.40, y: 59.11, icon: "pin.png", km: 1300 },
+  { name: "徳島港", x: 67.10, y: 60.11, icon: "ship.png", km: 1360 },
+  { name: "金刀比羅宮", x: 49.80, y: 46.01, icon: "pin.png", km: 1440 },
+  { name: "山上銀杏園", x: 42.70, y: 57.51, icon: "pin.png", km: 1540 }
+];
+
+const GOAL_KM = 1619.5;
+
+const routeSegments = [
+  // 道後 → 佐賀関港
+  { kmStart: 0,    kmEnd: 80,   ratioStart: 0.00, ratioEnd: 0.06 },
+
+  // 佐賀関港 → 想夫恋
+  { kmStart: 80,   kmEnd: 160,  ratioStart: 0.06, ratioEnd: 0.105 },
+
+  // 想夫恋 → 門司港（アンカー区間）
+  { kmStart: 160,  kmEnd: 320,  ratioStart: 0.105, ratioEnd: 0.195 },
+
+  // ★ 門司港 → 明石（water区間・まとめ）
+  { kmStart: 320,  kmEnd: 800,  ratioStart: 0.195, ratioEnd: 0.495 },
+
+  // 明石 → 伊勢神宮（アンカー区間）
+  { kmStart: 800,  kmEnd: 1050, ratioStart: 0.495, ratioEnd: 0.625 },
+
+  // 伊勢神宮 → 中間点（体感補正）
+  { kmStart: 1050, kmEnd: 1200, ratioStart: 0.625, ratioEnd: 0.70 },
+
+  // 中間点 → 高野山
+  { kmStart: 1200, kmEnd: 1300, ratioStart: 0.70, ratioEnd: 0.76 },
+
+  // 高野山 → 徳島港
+  { kmStart: 1300, kmEnd: 1360, ratioStart: 0.76, ratioEnd: 0.82 },
+
+  // 徳島港 → 金毘羅宮
+  { kmStart: 1360, kmEnd: 1440, ratioStart: 0.82, ratioEnd: 0.90 },
+
+  // 金毘羅宮 → 山上銀杏園（ゴール前）
+  { kmStart: 1440, kmEnd: 1600, ratioStart: 0.90, ratioEnd: 1.00 }
+];
+
+const STORAGE_KEY = "yunomichi_history";
+
+const inputKm = document.getElementById("inputKm");
+const historyList = document.getElementById("historyList");
+const progressPath = document.getElementById("progressPath");
+
+const startPin = document.querySelector(".pin-start");
+const goalPin = document.querySelector(".pin-goal");
+
+let history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+function totalKm() {
+return history.reduce((sum, h) => sum + h.km, 0);
+}
+
+function kmToRatio(actualKm) {
+  const km = Math.min(actualKm, GOAL_KM);
+
+  const seg = routeSegments.find(
+    s => km >= s.kmStart && km <= s.kmEnd
+  );
+
+  if (!seg) return 1;
+
+  const progress =
+    (km - seg.kmStart) / (seg.kmEnd - seg.kmStart);
+
+  return seg.ratioStart +
+    (seg.ratioEnd - seg.ratioStart) * progress;
+}
+
+
+
+function updateRoute() {
+  if (!progressPath.getTotalLength) return;
+
+  const length = progressPath.getTotalLength();
+  const ratio = kmToRatio(totalKm());
+
+  progressPath.style.strokeDasharray = length;
+  progressPath.style.strokeDashoffset =
+    length - length * ratio;
+}
+
+
+function updateGoalPin() {
+if (totalKm() >= GOAL_KM) {
+startPin.classList.add("hidden");
+goalPin.classList.remove("hidden");
+goalPin.classList.add("reached");
+} else {
+startPin.classList.remove("hidden");
+goalPin.classList.add("hidden");
+}
+}
+
+
+function renderHistory() {
+const tbody = document.querySelector("#historyTable tbody");
+tbody.innerHTML = "";
+
+// 合計距離を先に全部計算
+let total = history.reduce((sum, h) => sum + h.km, 0);
+
+// 降順（最新が上）
+[...history].reverse().forEach((h, index) => {
+const tr = document.createElement("tr");
+
+const date = h.date
+  ? new Date(h.date).toLocaleDateString()
+  : "";
+
+const realIndex = history.length - 1 - index;
+
+
+tr.innerHTML = `
+<td>${realIndex + 1}</td>
+<td style="text-align:center">${date}</td>
+<td>${h.km.toFixed(2)}</td>
+<td>${total.toFixed(2)}</td>
+<td>${(h.points && h.points.length)
+  ? h.points.join("／")
+  : ""}</td>
+<td style="text-align:center">
+  <button data-index="${realIndex}">削除</button>
+</td>
+`;
+
+
+tbody.appendChild(tr);
+total -= h.km;
+});
+
+// 削除ボタン処理
+tbody.querySelectorAll("button").forEach(btn => {
+btn.addEventListener("click", () => {
+const i = Number(btn.dataset.index);
+history.splice(i, 1);
+save();
+updateRoute();
+updateGoalPin();
+renderHistory();
+});
+});
+}
+
+function createMilestones() {
+  const mapWrapper = document.querySelector(".map-wrapper");
+
+  milestones.forEach(m => {
+    const img = document.createElement("img");
+    img.src = m.icon;
+    img.className = "milestone";
+    img.style.left = m.x + "%";
+    img.style.top = m.y + "%";
+    img.title = m.name;
+
+    mapWrapper.appendChild(img);
+
+    m._el = img; // ★ 後続処理で必須
+  });
+}
+
+
+function updateEvents() {
+if (!milestones || milestones.length === 0) return;
+if (!milestones[0]._el) return;
+  const box = document.getElementById("milestoneMessage");
+  if (!box) return;
+
+  const total = totalKm();
+
+  // ===== milestone 表示制御 =====
+  milestones.forEach(m => {
+    // 初期は必ず薄く
+    m._el.style.opacity = "0.3";
+
+    // 到達したものだけ濃く
+    if (total >= m.km) {
+      m._el.style.opacity = "1";
+    }
+  });
+
+  // ===== event message =====
+  events.forEach(e => {
+    if (e._shown) return;
+
+    if (total > 0 && total >= e.distanceKm) {
+      const lines = Array.isArray(e.message) ? e.message : [e.message];
+
+      box.innerHTML = `
+        <strong>${e.point}</strong><br>
+        ${lines.join("<br>")}
+      `;
+
+      box.classList.add("show");
+
+      setTimeout(() => {
+        box.classList.remove("show");
+      }, 4500);
+
+      e._shown = true;
+    }
+  });
+
+
+// ===== 赤ピン 到達判定（kmベース） =====
+const totalDistance = totalKm();
+
+points.forEach(p => {
+  if (!p._el || p.icon !== "pin.png") return;
+  if (typeof p.km !== "number") return;
+
+  const reached = totalDistance >= p.km;
+
+  p._el.classList.toggle("is-reached", reached);
+  p._el.classList.toggle("is-not-reached", !reached);
+});
+
+}
+
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+}
+
+
+function getAllPoints() {
+  const eventPoints = (events || []).map(e => ({
+    name: e.point,
+    km: Number(e.distanceKm ?? e.km)
+  }));
+
+  const milestonePoints = (milestones || []).map(m => ({
+    name: m.name,
+    km: Number(m.km)
+  }));
+
+  return [...eventPoints, ...milestonePoints]
+    .filter(p => !isNaN(p.km))
+    .sort((a, b) => a.km - b.km);
+}
+
+document.getElementById("addBtn").addEventListener("click", () => {
+  const km = Number(inputKm.value);
+  if (isNaN(km) || km <= 0) return;
+
+  const beforeKm = totalKm();
+  const afterKm = beforeKm + km;
+
+  const passedPoints = getAllPoints()
+    .filter(p => p.km > beforeKm && p.km <= afterKm)
+    .map(p => p.name);
+
+  history.push({
+    km,
+    date: new Date().toISOString(),
+    points: passedPoints
+  });
+
+  save();
+  updateRoute();
+  updateGoalPin();
+  renderHistory();
+  updateEvents();
+  inputKm.value = "";
+});
+
+const mapWrapper = document.querySelector(".map-wrapper");
+
+points.forEach(p => {
+  const img = document.createElement("img");
+  img.src = p.icon;
+  img.className = "pin";
+
+  if (p.icon === "pin.png") {
+    img.classList.add("pin-small", "is-not-reached");
+    img.dataset.label = p.name;   // 案内用
+    img.dataset.km = p.km ?? "";  // 距離（あれば）
+    img.tabIndex = 0;
+  } else {
+    img.classList.add("pin-large");
+  }
+
+  img.style.left = p.x + "%";
+  img.style.top = p.y + "%";
+  mapWrapper.appendChild(img);
+
+  p._el = img; // 後で制御するため保持
+});
+
+
+// ===== events 読み込み =====
+let events = [];
+
+fetch("events.json")
+  .then(res => res.json())
+  .then(data => {
+    // events.json が { events: [...] } 形式なので取り出す
+    events = data.events || [];
+    events.forEach(e => e._shown = false); // 表示済みフラグ
+  });
+
+// ===== milestones 読み込み =====
+let milestones = [];
+
+fetch("milestones.json")
+  .then(res => res.json())
+  .then(data => {
+    milestones = data;
+    createMilestones();
+
+    milestones.forEach(m => {
+      m._el.classList.remove("active");
+    });
+
+    updateEvents(); // ★ 初期表示で必ず一度反映
+  });
+
+
+
+updateRoute();
+updateGoalPin();
+renderHistory();
+
+</script>
+
+</body>
+</html>
