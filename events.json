@@ -15,7 +15,7 @@
 {
 "routeNo": 2,
 "area": "南予",
-"distanceKm": 25,
+"distanceKm": 26,
 "point": "ふたみシーサイド公園",
 "trigger": "water",
 "category": "給水",
@@ -27,7 +27,7 @@
 {
 "routeNo": 3,
 "area": "南予",
-"distanceKm": 42,
+"distanceKm": 43,
 "point": "長浜大橋",
 "trigger": "water",
 "category": "風景",
@@ -39,7 +39,7 @@
 {
 "routeNo": 4,
 "area": "南予",
-"distanceKm": 74,
+"distanceKm": 76,
 "point": "亀ヶ池温泉",
 "trigger": "water",
 "category": "温泉",
@@ -51,7 +51,7 @@
 {
 "routeNo": 5,
 "area": "南予",
-"distanceKm": 96,
+"distanceKm": 99,
 "point": "三崎港",
 "trigger": "water",
 "category": "体験",
@@ -63,7 +63,7 @@
 {
 "routeNo": 6,
 "area": "豊後水道",
-"distanceKm": 97,
+"distanceKm": 99.001,
 "point": "佐賀関港",
 "trigger": "milestone",
 "category": "通過",
@@ -75,7 +75,7 @@
 {
 "routeNo": 7,
 "area": "大分",
-"distanceKm": 117,
+"distanceKm": 127,
 "point": "マッテルモン",
 "trigger": "water",
 "category": "風景",
@@ -87,7 +87,7 @@
 {
 "routeNo": 8,
 "area": "大分",
-"distanceKm": 127,
+"distanceKm": 137,
 "point": "大分別府マラソン",
 "trigger": "water",
 "category": "通過",
@@ -99,7 +99,7 @@
 {
 "routeNo": 9,
 "area": "大分",
-"distanceKm": 137,
+"distanceKm": 147,
 "point": "別府温泉",
 "trigger": "water",
 "category": "温泉",
@@ -903,7 +903,7 @@
 {
 "routeNo": 76,
 "area": "讃岐",
-"distanceKm": 1440,
+"distanceKm": 1435,
 "point": "🔴金刀比羅宮",
 "trigger": "milestone",
 "category": "体験",
@@ -915,7 +915,7 @@
 {
 "routeNo": 77,
 "area": "香川",
-"distanceKm": 1460,
+"distanceKm": 1455,
 "point": "丸亀うちわミュージアム",
 "trigger": "water",
 "category": "給水",
@@ -927,7 +927,7 @@
 {
 "routeNo": 78,
 "area": "香川",
-"distanceKm": 1480,
+"distanceKm": 1470,
 "point": "銭形砂絵",
 "trigger": "water",
 "category": "風景",
@@ -939,7 +939,7 @@
 {
 "routeNo": 79,
 "area": "香川",
-"distanceKm": 1500,
+"distanceKm": 1489,
 "point": "境目峠",
 "trigger": "water",
 "category": "通過",
@@ -951,7 +951,7 @@
 {
 "routeNo": 80,
 "area": "香川",
-"distanceKm": 1520,
+"distanceKm": 1512,
 "point": "翠波橋",
 "trigger": "water",
 "category": "給水",
@@ -963,7 +963,7 @@
 {
 "routeNo": 81,
 "area": "東予",
-"distanceKm": 1540,
+"distanceKm": 1532,
 "point": "🔴山上銀杏園",
 "trigger": "milestone",
 "category": "風景",
@@ -975,7 +975,7 @@
 {
 "routeNo": 82,
 "area": "東予",
-"distanceKm": 1555,
+"distanceKm": 1552,
 "point": "旧広瀬邸（広瀬歴史記念館）",
 "trigger": "water",
 "category": "通過",
@@ -987,7 +987,7 @@
 {
 "routeNo": 83,
 "area": "東予",
-"distanceKm": 1577.5,
+"distanceKm": 1577,
 "point": "周ちゃん広場",
 "trigger": "water",
 "category": "食",
@@ -999,13 +999,13 @@
 {
 "routeNo": 84,
 "area": "東予",
-"distanceKm": 1598.7,
+"distanceKm": 1597,
 "point": "雨滝音田の棚田",
 "trigger": "water",
 "category": "給水",
 "message": [
-"棚田の景色に、足を止めて。",
-"重ねてきた距離が、風景と重なります。"
+"棚田の景色に、足を止めて……ここから",
+"試練のはじまり……ゴールはどこ?!"
 ]
 },
 {

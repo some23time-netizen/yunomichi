@@ -715,20 +715,16 @@ function save() {
 
 
 function getAllPoints() {
-  const eventPoints = (events || []).map(e => ({
-    name: e.point,
-    km: Number(e.distanceKm ?? e.km)
-  }));
-
-  const milestonePoints = (milestones || []).map(m => ({
-    name: m.name,
-    km: Number(m.km)
-  }));
-
-  return [...eventPoints, ...milestonePoints]
+  // 通過ポイントは event.json のみを使う
+  return (events || [])
+    .map(e => ({
+      name: e.point,
+      km: Number(e.distanceKm ?? e.km)
+    }))
     .filter(p => !isNaN(p.km))
     .sort((a, b) => a.km - b.km);
 }
+
 
 document.getElementById("addBtn").addEventListener("click", () => {
   const km = Number(inputKm.value);
