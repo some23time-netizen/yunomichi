@@ -175,6 +175,25 @@ font-size: 12px;
 cursor: pointer;
 }
 
+/* ===== 履歴：日付（2行・強弱あり） ===== */
+.history-date {
+  text-align: center;
+  line-height: 1.2;
+}
+
+.history-date .date-main {
+  font-size: 16px;      /* ← 主役：2月4日 */
+}
+
+.history-date .date-sub {
+  font-size: 11px;      /* ← 脇役：年・時刻 */
+  color: #666;
+}
+
+.history-date .date-year {
+  font-size: 10px;
+  color: #999;
+}
 
 .milestone {
   position: absolute;
@@ -292,14 +311,14 @@ h1 {
   }
 
   /* 通過ポイント（縦に読む設計） */
- .history th:nth-child(5),
+.history th:nth-child(5),
 .history td:nth-child(5) {
-  width: auto;              /* ← 固定幅をやめる */
+  width: auto;
   font-size: 12px;
   line-height: 1.4;
   white-space: normal;
-  word-break: break-word;   /* ← 見切れ防止の決定打 */
-  vertical-align: top;
+  word-break: break-word;
+  vertical-align: middle;  /* ← 中央揃え */
 }
 
 
@@ -595,9 +614,22 @@ let total = history.reduce((sum, h) => sum + h.km, 0);
 [...history].reverse().forEach((h, index) => {
 const tr = document.createElement("tr");
 
-const date = h.date
-  ? new Date(h.date).toLocaleDateString()
+const d = h.date ? new Date(h.date) : null;
+
+const date = d
+  ? `
+    <div class="history-date">
+      <div class="date-main">
+        ${d.getMonth() + 1}月${d.getDate()}日
+      </div>
+      <div class="date-sub">
+         ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}
+        <span class="date-year">（${d.getFullYear()}）</span>
+        </div>
+    </div>
+  `
   : "";
+
 
 const realIndex = history.length - 1 - index;
 
