@@ -607,6 +607,9 @@ function renderHistory() {
 const tbody = document.querySelector("#historyTable tbody");
 tbody.innerHTML = "";
 
+  const passedPerRow =
+    calculatePassedPointsPerRow(history, getAllPassingPoints());
+
 // 合計距離を先に全部計算
 let total = history.reduce((sum, h) => sum + h.km, 0);
 
@@ -632,6 +635,7 @@ const date = d
 
 
 const realIndex = history.length - 1 - index;
+const rowPassed = passedPerRow[realIndex] || [];
 
 
 tr.innerHTML = `
@@ -639,9 +643,7 @@ tr.innerHTML = `
 <td style="text-align:center">${date}</td>
 <td>${h.km.toFixed(2)}</td>
 <td>${total.toFixed(2)}</td>
-<td>${(h.points && h.points.length)
-  ? h.points.join("／")
-  : ""}</td>
+<td>${rowPassed.join("／")}</td>
 <td style="text-align:center">
   <button data-index="${realIndex}">削除</button>
 </td>
@@ -658,9 +660,11 @@ btn.addEventListener("click", () => {
 const i = Number(btn.dataset.index);
 history.splice(i, 1);
 save();
+events.forEach(e => e._shown = false); // ← ★ これを追加
 updateRoute();
 updateGoalPin();
 renderHistory();
+updateEvents();
 });
 });
 }
@@ -765,22 +769,22 @@ document.getElementById("addBtn").addEventListener("click", () => {
   const beforeKm = totalKm();
   const afterKm = beforeKm + km;
 
-  const passedPoints = getAllPoints()
-    .filter(p => p.km > beforeKm && p.km <= afterKm)
-    .map(p => p.name);
+history.push({
+  km,
+  date: new Date().toISOString()
+});
 
-  history.push({
-    km,
-    date: new Date().toISOString(),
-    points: passedPoints
+save();
+events.forEach(e => {
+    if (e.distanceKm > beforeKm) {
+      e._shown = false;
+    }
   });
-
-  save();
-  updateRoute();
-  updateGoalPin();
-  renderHistory();
-  updateEvents();
-  inputKm.value = "";
+updateRoute();
+updateGoalPin();
+renderHistory();
+updateEvents();
+inputKm.value = "";
 });
 
 const mapWrapper = document.querySelector(".map-wrapper");
@@ -813,10 +817,12 @@ let events = [];
 fetch("events.json")
   .then(res => res.json())
   .then(data => {
-    // events.json が { events: [...] } 形式なので取り出す
     events = data.events || [];
-    events.forEach(e => e._shown = false); // 表示済みフラグ
+    events.forEach(e => e._shown = false);
+
+    renderHistory();   // ← ★ 追加
   });
+
 
 // ===== milestones 読み込み =====
 let milestones = [];
@@ -835,10 +841,67 @@ fetch("milestones.json")
   });
 
 
+function calculatePassedPointsPerRow(history, passingPoints) {
+  let total = 0;
+  const result = [];
+
+  history.forEach(h => {
+    const prevTotal = total;
+    total += h.km;
+
+    const passedHere = passingPoints
+  .filter(p =>
+    typeof p.km === "number" &&
+    prevTotal < p.km &&
+    total >= p.km
+  )
+  .sort((a, b) => a.km - b.km) // ★ 追加：距離順保証
+  .map(p => p.name);
+
+    result.push(passedHere);
+  });
+
+  return result;
+}
+
+
+function getAllPassingPoints() {
+  const list = [];
+
+  // events.json
+  events.forEach(e => {
+    const km = Number(e.distanceKm ?? e.km);
+    if (!isNaN(km)) {
+      list.push({ name: e.point, km });
+    }
+  });
+
+  // milestones.json
+  milestones.forEach(m => {
+    if (typeof m.km === "number") {
+      list.push({ name: m.name, km: m.km });
+    }
+  });
+
+  // 重複除去
+  const unique = [];
+  const seen = new Set();
+
+  list.forEach(p => {
+    const key = `${p.name}@@${p.km}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(p);
+    }
+  });
+
+  unique.sort((a, b) => a.km - b.km);
+  return unique;
+}
+
 
 updateRoute();
 updateGoalPin();
-renderHistory();
 
 </script>
 

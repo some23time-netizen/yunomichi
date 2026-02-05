@@ -63,7 +63,7 @@
 {
 "routeNo": 6,
 "area": "豊後水道",
-"distanceKm": 99.001,
+"distanceKm": 99,
 "point": "佐賀関港",
 "trigger": "milestone",
 "category": "通過",
