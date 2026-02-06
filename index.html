@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -118,10 +119,15 @@ opacity: 1;
 display: none;
 }
 
-/* ===== 操作 ===== */
-.controls {
-margin-top: 16px;
+
+
+
+/* 復活ボタンは控えめ表示 */
+#loadBtn {
+  font-size: 12px;
+  opacity: 0.7;
 }
+
 
 /* 距離入力欄を見やすく */
 #inputKm {
@@ -378,6 +384,49 @@ h1 {
 }
 
 
+/* ===== 💡ヘルプ（文字だけ） ===== */
+.help-btn {
+  font-size: 16px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.help-btn:hover {
+  opacity: 1;
+}
+
+/* ===== 履歴下の復活エリア ===== */
+.history-footer {
+  margin-top: 8px;
+  text-align: right;
+}
+
+/* ===== 操作ボタン位置調整（最終・右端完全一致）===== */
+.controls {
+  margin-top: 16px;
+}
+
+.controls-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ★ 右端の基準（ここだけが重要） */
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 200px;
+  justify-content: flex-end;
+}
+
+.controls-sub {
+  margin-top: 6px;
+}
+
+
 </style>
 </head>
 
@@ -461,15 +510,28 @@ style="left:33.30%; top:56.55%;">
 </div>
 
 <div class="controls">
-<input
-  type="number"
-  id="inputKm"
-  step="0.01"
-  placeholder="歩いた距離/km"
->
 
-<button id="addBtn">追加</button>
+  <div class="controls-row">
+    <div class="controls-right">
+      <input
+        type="number"
+        id="inputKm"
+        step="0.01"
+        placeholder="歩いた距離/km"
+      >
+      <button id="addBtn">追加</button>
+    </div>
+  </div>
+
+  <div class="controls-row controls-sub">
+  <div class="controls-right">
+    <button class="help-btn" data-help="save">💡</button>
+    <button id="saveBtn">保存</button>
+  </div>
 </div>
+
+</div>
+
 
 <div class="history">
 <strong>履歴</strong>
@@ -491,6 +553,15 @@ style="left:33.30%; top:56.55%;">
 </tbody>
 </table>
 </div>
+
+<div class="history-footer">
+  <button class="help-btn" data-help="load">💡</button>
+  <button id="loadBtn">復活</button>
+</div>
+
+<!-- ★ 見えないけど必須。どこでもいいので body 内に残す -->
+<input type="file" id="loadInput" accept=".json" style="display:none">
+
 
 <script>
 
@@ -898,6 +969,91 @@ function getAllPassingPoints() {
   unique.sort((a, b) => a.km - b.km);
   return unique;
 }
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const data = {
+    history
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  
+const now = new Date();
+const y = now.getFullYear();
+const m = String(now.getMonth() + 1).padStart(2, "0");
+const d = String(now.getDate()).padStart(2, "0");
+const hh = String(now.getHours()).padStart(2, "0");
+const mm = String(now.getMinutes()).padStart(2, "0");
+a.download = `yunomichi_${y}${m}${d}_${hh}${mm}.json`;
+
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("loadBtn").addEventListener("click", () => {
+  document.getElementById("loadInput").click();
+});
+
+document.getElementById("loadInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+
+      if (!Array.isArray(data.history)) {
+        alert("不正なファイルです");
+        return;
+      }
+
+      history = data.history;
+      save();
+
+      events.forEach(e => e._shown = false);
+
+      updateRoute();
+      updateGoalPin();
+      renderHistory();
+      updateEvents();
+
+      alert("復活しました");
+    } catch {
+      alert("読み込みに失敗しました");
+    }
+  };
+  reader.readAsText(file);
+});
+
+
+// ===== ヘルプ（？）ボタン =====
+document.querySelectorAll(".help-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (btn.dataset.help === "save") {
+      alert(
+        "このアプリの記録は、ブラウザに一時的に保存されています。\n" +
+        "ブラウザのデータを削除すると、アプリ上の記録は消えます。\n\n" +
+        "「保存」でダウンロードしたファイルは、スマホに残ります。\n" +
+        "定期的な保存をおすすめします。"
+      );
+    }
+
+    if (btn.dataset.help === "load") {
+      alert(
+        "保存しておいたファイルを読み込むことで、\n" +
+        "記録を元に戻すこと（復活）ができます。\n\n" +
+        "誤ってデータ削除をした場合に使います。"
+      );
+    }
+  });
+});
 
 
 updateRoute();
