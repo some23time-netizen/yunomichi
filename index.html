@@ -384,11 +384,14 @@ h1 {
   img[src*="ise"] { width: 24px; }
 
   /* ===== スマホ：メッセージ微調整 ===== */
-   .milestone-message {
+@media (max-width: 600px) {
+  .milestone-message {
     top: 80%;
-    font-size: 13px;
-    padding: 12px 16px;
+    left: 12px;
+    right: auto;
   }
+}
+
 
 
 #inputKm {
