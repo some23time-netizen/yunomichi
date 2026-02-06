@@ -121,7 +121,7 @@ display: none;
 
 
 
-/* 復活ボタンは控えめ表示 */
+/* 復元ボタンは控えめ表示 */
 #loadBtn {
   font-size: 12px;
   opacity: 0.7;
@@ -301,9 +301,10 @@ cursor: pointer;
   #addBtn {
     font-size: 16px;
     padding: 10px 16px;
+    white-space: nowrap;
   }
 
-  /* 保存・復活（脇役） */
+  /* 保存・復元（脇役） */
   #saveBtn,
   #loadBtn {
     font-size: 14px;
@@ -442,7 +443,7 @@ h1 {
   opacity: 1;
 }
 
-/* ===== 履歴下の復活エリア ===== */
+/* ===== 履歴下の復元エリア ===== */
 .history-footer {
   margin-top: 8px;
   text-align: right;
@@ -601,7 +602,7 @@ style="left:33.30%; top:56.55%;">
 
 <div class="history-footer">
   <button class="help-btn" data-help="load">💡</button>
-  <button id="loadBtn">復活</button>
+  <button id="loadBtn">復元</button>
 </div>
 
 <!-- ★ 見えないけど必須。どこでもいいので body 内に残す -->
@@ -1069,7 +1070,7 @@ document.getElementById("loadInput").addEventListener("change", e => {
       renderHistory();
       updateEvents();
 
-      alert("復活しました");
+      alert("復元しました");
     } catch {
       alert("読み込みに失敗しました");
     }
@@ -1093,7 +1094,7 @@ document.querySelectorAll(".help-btn").forEach(btn => {
     if (btn.dataset.help === "load") {
       alert(
         "保存しておいたファイルを読み込むことで、\n" +
-        "記録を元に戻すこと（復活）ができます。\n\n" +
+        "記録を元に戻すこと（復元）ができます。\n\n" +
         "誤ってデータ削除をした場合に使います。"
       );
     }
