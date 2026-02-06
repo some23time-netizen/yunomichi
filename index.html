@@ -279,10 +279,13 @@ cursor: pointer;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  width: auto;            /* 固定200pxを解除 */
-  padding-left: 12px;     /* ← 左に寄せる */
-  padding-right: 0;       /* ← 右余白は使わない */
-  gap: 10px;              /* 指で押しやすい間隔 */
+
+  width: 100%;        /* ← 横幅を確保する */
+  max-width: 360px;   /* ← スマホで広がりすぎない */
+
+  padding-left: 12px; /* ← 左に寄せる */
+  padding-right: 0;   /* ← 右余白は使わない */
+  gap: 10px;          /* ← 指で押しやすい間隔 */
 }
   
   /* 入力欄 */
