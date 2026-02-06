@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -258,16 +257,54 @@ cursor: pointer;
   /* 画面余白を消す → 地図を横いっぱいに */
   body {
     padding: 0;
+    overflow-x: hidden;
   }
 
-body {
-  overflow-x: hidden;
+  .map-wrapper {
+    width: 100vw;                 /* 画面幅いっぱい */
+    max-width: none;              /* PC用制限を解除 */
+    margin-left: 50%;
+    transform: translateX(-50%);  /* 完全中央寄せ */
+  }
+
+  /* ===== 操作ボタン（追加・保存）を押しやすく ===== */
+
+/* 行は左基準にする */
+.controls-row {
+  justify-content: flex-start;
 }
-.map-wrapper {
-  width: 100vw;                 /* 画面幅いっぱい */
-  max-width: none;              /* PC用制限を解除 */
-  margin-left: 50%;
-  transform: translateX(-50%);  /* 完全中央寄せ */
+
+/* 操作エリアを左に寄せ、折り返しを防ぐ */
+.controls-right {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: auto;            /* 固定200pxを解除 */
+  padding-left: 12px;     /* ← 左に寄せる */
+  padding-right: 0;       /* ← 右余白は使わない */
+  gap: 10px;              /* 指で押しやすい間隔 */
+}
+  
+  /* 入力欄 */
+  #inputKm {
+    width: 140px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  /* 追加ボタン（主役） */
+  #addBtn {
+    font-size: 16px;
+    padding: 10px 16px;
+  }
+
+  /* 保存・復活（脇役） */
+  #saveBtn,
+  #loadBtn {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
 }
 
   /* タイトルと地図の距離 */
