@@ -73,17 +73,20 @@
 ]
 },
 {
-"routeNo": 7,
-"area": "大分",
-"distanceKm": 127,
-"point": "マッテルモン",
-"trigger": "water",
-"category": "風景",
-"message": [
-"かつてのフェリーの記憶を残す、赤い可動橋のそば。",
-"マッテルモンが、静かに旅人を待っています。"
-]
-},
+  "routeNo": 7,
+  "area": "大分",
+  "distanceKm": 127,
+  "point": "マッテルモン",
+  "image": "mattelmon.png",
+  "trigger": "water",
+  "category": "風景",
+  "message": [
+    "かつてのフェリーの記憶を残す、赤い可動橋のそば。",
+    "マッテルモンが、静かに旅人を待っています。",
+    "<img src='mattelmon.png' style='width:100%;max-width:130px;margin-top:8px;border-radius:8px;'>"
+  ]
+}
+,
 {
 "routeNo": 8,
 "area": "大分",

@@ -373,6 +373,19 @@ cursor: pointer;
     width: 44px;
   }
 
+/* ===== 履歴：見出しの改行を防ぐ ===== */
+.history th:nth-child(5) {
+  white-space: nowrap;   /* 「通過ポイント」を1行に */
+}
+
+/* No列を少しだけ細くする */
+.history th:nth-child(1),
+.history td:nth-child(1) {
+  width: 24px;
+}
+
+
+
   /* ===== ピンサイズ ===== */
   .pin-small { width: 12px; }
   img[src*="ship"] { width: 20px; }
@@ -453,8 +466,14 @@ cursor: pointer;
 
 .controls-spacer {
   display: inline-block;
-  width: 30em;   /* 全角1文字分 */
+  width: 3em;   /* 全角1文字分 */
 }
+
+/* 履歴：通過ポイントをクリック可能に見せる */
+  .passed-point {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 
 </style>
 </head>
@@ -525,6 +544,12 @@ stroke-linejoin="round"
 
 
 <div id="milestoneMessage" class="milestone-message"></div>
+
+<div
+  id="pointDetail"
+  class="milestone-message hidden"
+></div>
+
 
 <!-- 道後温泉：スタート -->
 <img src="onsen.png"
@@ -612,6 +637,16 @@ const points = [
   { name: "金刀比羅宮", x: 49.80, y: 46.01, icon: "pin.png", km: 1440 },
   { name: "山上銀杏園", x: 42.70, y: 57.51, icon: "pin.png", km: 1540 }
 ];
+
+const POINTS_WITH_IMAGE = [
+  "マッテルモン"
+  // 今後ここに追加していく
+];
+
+
+
+
+
 
 const GOAL_KM = 1619.5;
 
@@ -744,7 +779,20 @@ tr.innerHTML = `
 <td style="text-align:center">${date}</td>
 <td>${h.km.toFixed(2)}</td>
 <td>${total.toFixed(2)}</td>
-<td>${rowPassed.join("／")}</td>
+<td>
+${rowPassed.map(name => {
+  if (POINTS_WITH_IMAGE.includes(name)) {
+    return `<span
+      class="passed-point"
+      style="cursor:pointer;"
+      onclick="showPointDetail('${name}')"
+    >📷 ${name}</span>`;
+  } else {
+    return `<span>${name}</span>`;
+  }
+}).join("／")}
+
+</td>
 <td style="text-align:center">
   <button data-index="${realIndex}">削除</button>
 </td>
@@ -1089,7 +1137,34 @@ document.querySelectorAll(".help-btn").forEach(btn => {
 updateRoute();
 updateGoalPin();
 
+
+function showPointDetail(pointName) {
+  const box = document.getElementById("pointDetail");
+  if (!box) return;
+
+  if (pointName === "マッテルモン") {
+    box.innerHTML = `
+      <strong>マッテルモン</strong><br>
+      <img src="mattelmon.png" style="width:50%; margin:8px 0;"><br>
+      かつてのフェリーの記憶を残す、赤い可動橋のそば。<br>
+      マッテルモンが、静かに旅人を待っています。
+    `;
+
+    box.classList.remove("hidden");
+    box.classList.add("show");
+
+    clearTimeout(box._timer);
+    box._timer = setTimeout(() => {
+      box.classList.remove("show");
+      box.classList.add("hidden");
+    }, 4500);
+  }
+}
+
+
 </script>
+
+
 
 </body>
 </html>
