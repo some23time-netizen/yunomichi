@@ -128,12 +128,13 @@ display: none;
 }
 
 
-/* 距離入力欄を見やすく */
+/* 距離入力欄を見やすく（右寄せ） */
 #inputKm {
-  width: 120px;        /* 横は控えめ */
+  width: 120px;        /* ← 横幅はそのまま */
   height: 40px;
   font-size: 16px;
   padding: 4px 6px;
+  text-align: right;   /* ← カーソルを右端に */
 }
 
 .history {
@@ -269,57 +270,52 @@ cursor: pointer;
     transform: translateX(-50%);  /* 完全中央寄せ */
   }
 
-  /* ===== 操作ボタン（追加・保存）を押しやすく ===== */
+  /* ===== 操作ボタン行 ===== */
 
-/* 行は左基準にする */
-.controls-row {
-  justify-content: flex-start;
-}
+  /* 行は左基準 */
+  .controls-row {
+    justify-content: flex-start;
+  }
 
-/* 操作エリアを左に寄せ、折り返しを防ぐ */
-.controls-right {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
+  /* 操作エリア */
+  .controls-right {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    padding-left: 12px;
+    padding-right: 0;
+    gap: 10px;
+  }
 
-  width: 100%;        /* ← 横幅を確保する */
-  max-width: 360px;   /* ← スマホで広がりすぎない */
-
-  padding-left: 12px; /* ← 左に寄せる */
-  padding-right: 0;   /* ← 右余白は使わない */
-  gap: 10px;          /* ← 指で押しやすい間隔 */
-}
-  
   /* 入力欄 */
   #inputKm {
-    width: 140px;
+    width: 120px;
     height: 44px;
     font-size: 18px;
   }
 
-  /* 追加ボタン（主役） */
-  #addBtn {
-    font-size: 16px;
-    padding: 10px 16px;
-    white-space: nowrap;
-  }
-
-  /* 保存・復元（脇役） */
+  /* ===== 操作ボタン 見た目を完全統一 ===== */
+  #addBtn,
   #saveBtn,
   #loadBtn {
     font-size: 14px;
-    padding: 8px 12px;
+    padding: 6px 10px;
+    color: #000;
+    background: #f5f5f5;   /* 薄いグレー */
+    border: 1px solid #999;
+    border-radius: 6px;
+    white-space: nowrap;
   }
 
-}
+  /* ===== タイトル ===== */
+  h1 {
+    margin: 16px 0;
+    text-align: center;
+  }
 
-  /* タイトルと地図の距離 */
-h1 {
-  margin: 16px 0;
-  text-align: center;
-}
-
-  /* milestone（食・名所） */
+  /* ===== milestone ===== */
   .milestone {
     width: 28px;
     transform: translate(-50%, -60%);
@@ -351,27 +347,25 @@ h1 {
     white-space: nowrap;
   }
 
-.history th:nth-child(3),
-.history td:nth-child(3),
-.history th:nth-child(4),
-.history td:nth-child(4) {
-  width: 80px;
-  font-size: 16px;
-  padding-right: 0;
-  text-align: center;   /* ← これだけ追加 */
-}
+  .history th:nth-child(3),
+  .history td:nth-child(3),
+  .history th:nth-child(4),
+  .history td:nth-child(4) {
+    width: 80px;
+    font-size: 16px;
+    text-align: center;
+  }
 
-  /* 通過ポイント（縦に読む設計） */
-.history th:nth-child(5),
-.history td:nth-child(5) {
-  width: auto;
-  font-size: 12px;
-  line-height: 1.4;
-  white-space: normal;
-  word-break: break-word;
-  vertical-align: middle;  /* ← 中央揃え */
-}
-
+  /* 通過ポイント */
+  .history th:nth-child(5),
+  .history td:nth-child(5) {
+    width: auto;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: break-word;
+    vertical-align: middle;
+  }
 
   /* 削除ボタン */
   .history th:nth-child(6),
@@ -386,19 +380,10 @@ h1 {
   .pin-goal,
   img[src*="ise"] { width: 24px; }
 
+}  /* ← ★ @media はここで終了 */
 
-#inputKm {
-  width: 120px;
-  height: 44px;
-  font-size: 18px;
-}
 
-#addBtn {
-  font-size: 16px;
-  padding: 8px 12px;
-}
 
-} /* ← ★ @media はここで終了 */
 
 
 
@@ -466,6 +451,10 @@ h1 {
   margin-top: 6px;
 }
 
+.controls-spacer {
+  display: inline-block;
+  width: 30em;   /* 全角1文字分 */
+}
 
 </style>
 </head>
@@ -557,16 +546,17 @@ style="left:33.30%; top:56.55%;">
         type="number"
         id="inputKm"
         step="0.01"
-        placeholder="歩いた距離/km"
+        placeholder="歩いた距離km"
       >
       <button id="addBtn">追加</button>
+      <span class="controls-spacer"></span> <!-- ★追加 -->
     </div>
   </div>
 
   <div class="controls-row controls-sub">
   <div class="controls-right">
-    <button class="help-btn" data-help="save">💡</button>
     <button id="saveBtn">保存</button>
+   <button class="help-btn" data-help="save">💡</button>
   </div>
 </div>
 
@@ -594,9 +584,9 @@ style="left:33.30%; top:56.55%;">
 </table>
 </div>
 
-<div class="history-footer">
-  <button class="help-btn" data-help="load">💡</button>
+<div class="history-footer">  
   <button id="loadBtn">復元</button>
+ <button class="help-btn" data-help="load">💡</button>
 </div>
 
 <!-- ★ 見えないけど必須。どこでもいいので body 内に残す -->
