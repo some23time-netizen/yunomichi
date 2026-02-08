@@ -82,11 +82,9 @@
   "category": "風景",
   "message": [
     "かつてのフェリーの記憶を残す、赤い可動橋のそば。",
-    "マッテルモンが、静かに旅人を待っています。",
-    "<img src='mattelmon.png' style='width:100%;max-width:130px;margin-top:8px;border-radius:8px;'>"
+    "マッテルモンが、静かに旅人を待っています。"
   ]
-}
-,
+},
 {
 "routeNo": 8,
 "area": "大分",

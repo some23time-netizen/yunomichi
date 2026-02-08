@@ -334,38 +334,47 @@ cursor: pointer;
     width: 100%;
   }
 
-  .history th:nth-child(1),
-  .history td:nth-child(1) {
-    width: 32px;
-    font-size: 11px;
-  }
+.history th:nth-child(1),
+.history td:nth-child(1) {
+  width: 32px;
+}
 
-  .history th:nth-child(2),
-  .history td:nth-child(2) {
-    width: 70px;
-    font-size: 11px;
-    white-space: nowrap;
-  }
+.history th:nth-child(2),
+.history td:nth-child(2) {
+  width: 70px;
+  white-space: nowrap;
+}
 
-  .history th:nth-child(3),
-  .history td:nth-child(3),
-  .history th:nth-child(4),
-  .history td:nth-child(4) {
-    width: 80px;
-    font-size: 16px;
-    text-align: center;
-  }
 
-  /* 通過ポイント */
-  .history th:nth-child(5),
-  .history td:nth-child(5) {
-    width: auto;
-    font-size: 12px;
-    line-height: 1.4;
-    white-space: normal;
-    word-break: break-word;
-    vertical-align: middle;
-  }
+/* ===== 履歴：ヘッダー文字サイズ統一 ===== */
+.history th {
+  font-size: 13px;        /* 全項目同じサイズ */
+  font-weight: normal;    /* 太さも統一 */
+  white-space: nowrap;    /* 改行させない */
+}
+
+
+/* ===== 履歴：距離km・合計km（数値列） ===== */
+.history th:nth-child(3),
+.history td:nth-child(3),
+.history th:nth-child(4),
+.history td:nth-child(4) {
+  width: 64px;              /* ← 少し細く */
+  font-size: 15px;
+  text-align: right;        /* 数字は右揃え */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 履歴：通過ポイント ===== */
+.history th:nth-child(5),
+.history td:nth-child(5) {
+  width: auto;              /* ← 最大限使う */
+  font-size: 14px;          /* ← 12 → 14 で読みやすく */
+  line-height: 1.5;
+  white-space: normal;
+  word-break: break-word;
+  vertical-align: middle;
+}
 
   /* 削除ボタン */
   .history th:nth-child(6),
@@ -383,8 +392,6 @@ cursor: pointer;
 .history td:nth-child(1) {
   width: 24px;
 }
-
-
 
   /* ===== ピンサイズ ===== */
   .pin-small { width: 12px; }
@@ -404,7 +411,7 @@ cursor: pointer;
 .history td:nth-child(3),
 .history td:nth-child(4) {
   text-align: right;
-  font-size: 18px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
 }
@@ -474,6 +481,66 @@ cursor: pointer;
     cursor: pointer;
     text-decoration: underline;
   }
+
+/* ===== 履歴：文字系（No / 日付 / 通過 / 削除） ===== */
+.history td:nth-child(1),  /* No */
+.history td:nth-child(2),  /* 日付 */
+.history td:nth-child(5),  /* 通過ポイント */
+.history td:nth-child(6) { /* 削除 */
+  font-size: 14px;
+  font-weight: normal;
+  font-variant-numeric: normal;
+}
+
+
+/* ===== 📷 通過ポイント詳細：閉じるボタン ===== */
+
+.point-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.point-detail-close {
+  border: none;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.6;
+}
+
+.point-detail-close:hover {
+  opacity: 1;
+}
+
+.point-detail-image {
+  width: 100%;
+  max-width: 140px;     /* ← 半分くらいの体感サイズ */
+  margin: 8px auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.point-detail-text {
+  line-height: 1.5;
+}
+
+
+/* ===== 📱 オーバーレイ（背景を暗くする） ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4); /* ← 暗さはここ */
+  z-index: 40;                  /* pointDetail より下 */
+}
+
+.overlay.hidden {
+  display: none;
+}
+
 
 </style>
 </head>
@@ -596,8 +663,8 @@ style="left:33.30%; top:56.55%;">
 <tr>
   <th>No</th>
   <th>日付</th>
-  <th>距離 (km)</th>
-  <th>合計 (km)</th>
+  <th>距離km</th>
+  <th>合計km</th>
   <th>通過ポイント</th>
   <th>削除</th>
 </tr>
@@ -638,12 +705,37 @@ const points = [
   { name: "山上銀杏園", x: 42.70, y: 57.51, icon: "pin.png", km: 1540 }
 ];
 
+// ================================
+// 📷 通過ポイント（画像あり）定義
+// ================================
+
 const POINTS_WITH_IMAGE = [
-  "マッテルモン"
-  // 今後ここに追加していく
+  "マッテルモン",
+  "カッパの石像"
 ];
 
 
+const POINT_DETAILS = {
+  "マッテルモン": {
+    title: "マッテルモン",
+    img: "mattelmon.png",
+    text: `
+      かつてのフェリーの記憶を残す、赤い可動橋のそば。<br>
+      マッテルモンが、静かに旅人を待っています。
+    `,
+    autoClose: null
+  },
+
+  "カッパの石像": {
+    title: "カッパの石像",
+    img: "kappa.png",
+    text: `
+      不思議なカッパの石像に出会いました。<br>
+      思わず力が抜ける、旅の途中の小さな出来事です。
+    `,
+    autoClose: null
+  }
+};
 
 
 
@@ -1137,34 +1229,85 @@ document.querySelectorAll(".help-btn").forEach(btn => {
 updateRoute();
 updateGoalPin();
 
-
+// ===== 📷 通過ポイント詳細表示 =====
 function showPointDetail(pointName) {
   const box = document.getElementById("pointDetail");
   if (!box) return;
 
-  if (pointName === "マッテルモン") {
-    box.innerHTML = `
-      <strong>マッテルモン</strong><br>
-      <img src="mattelmon.png" style="width:50%; margin:8px 0;"><br>
-      かつてのフェリーの記憶を残す、赤い可動橋のそば。<br>
-      マッテルモンが、静かに旅人を待っています。
-    `;
+  const data = POINT_DETAILS[pointName];
+  if (!data) return;
 
-    box.classList.remove("hidden");
-    box.classList.add("show");
+  box.innerHTML = `
+    <div class="point-detail-header">
+      <strong>${data.title}</strong>
+      <button class="point-detail-close" aria-label="閉じる">×</button>
+    </div>
 
-    clearTimeout(box._timer);
-    box._timer = setTimeout(() => {
-      box.classList.remove("show");
-      box.classList.add("hidden");
-    }, 4500);
+    <img src="${data.img}" class="point-detail-image">
+
+    <div class="point-detail-text">
+      ${data.text}
+    </div>
+  `;
+
+  box.classList.remove("hidden");
+  box.classList.add("show");
+  document.getElementById("overlay").classList.remove("hidden");
+
+
+
+  clearTimeout(box._timer);
+  if (data.autoClose) {
+    box._timer = setTimeout(hidePointDetail, data.autoClose);
   }
+
+  // ×ボタン
+  box
+    .querySelector(".point-detail-close")
+    .addEventListener("click", hidePointDetail);
+
+  // 中をタップしても閉じない
+  box.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  // 外タップ判定を次のイベントから有効にする
+  box._outsideReady = false;
+  setTimeout(() => {
+    box._outsideReady = true;
+  }, 0);
+}
+
+// ===== 📷 通過ポイント詳細を閉じる（共通） =====
+function hidePointDetail() {
+  const box = document.getElementById("pointDetail");
+  if (!box) return;
+
+  clearTimeout(box._timer);
+  box.classList.remove("show");
+  box.classList.add("hidden");
+
+  box._outsideReady = false;
+
+  document.getElementById("overlay").classList.add("hidden");
 }
 
 
+// ===== 📱 外をタップしたら閉じる =====
+document.addEventListener("click", (e) => {
+  const box = document.getElementById("pointDetail");
+  if (!box) return;
+
+  if (!box.classList.contains("show")) return;
+  if (!box._outsideReady) return;
+  if (box.contains(e.target)) return;
+
+  hidePointDetail();
+});
+
 </script>
 
-
+<div id="overlay" class="overlay hidden"></div>
 
 </body>
 </html>
