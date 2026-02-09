@@ -1,3 +1,4 @@
+🔴📷マッテルモン河童
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -253,74 +254,6 @@ cursor: pointer;
 .milestone-message.show {
   opacity: 1;
 }
-
-/* ===== 📷 通過ポイント詳細（完成形） ===== */
-#pointDetail {
-  position: fixed;
-  left: 50%;
-  bottom: 12%;
-  transform: translateX(-50%);
-
-  width: 90%;              /* ← 幅を固定基準にする */
-  max-width: 320px;        /* ← PCでも横に伸びない */
-  
-  background: #ffe6ee;
-  padding: 16px;
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-
-  color: #000;
-  font-size: 14px;
-  line-height: 1.6;
-  text-align: left;
-
-  z-index: 100;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-
-  overflow: hidden;
-}
-
-
-#pointDetail.show {
-  opacity: 1;
-}
-
-/* ヘッダー（タイトル＋×） */
-#pointDetail .point-detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-#pointDetail .point-detail-header strong {
-  font-size: 16px;
-}
-
-/* ×ボタン */
-#pointDetail .point-detail-close {
-  border: none;
-  background: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* 画像 */
-#pointDetail .point-detail-image {
-  display: block;
-  width: 100%;
-  max-width: 140px;        /* ← マッテルモン基準 */
-  margin: 8px auto;
-  border-radius: 10px;
-}
-
-/* テキスト */
-#pointDetail .point-detail-text {
-  margin-top: 6px;
-}
-
-
 
 /* ===== スマホ最適化 ===== */
 @media (max-width: 600px) {
@@ -584,6 +517,14 @@ cursor: pointer;
   opacity: 1;
 }
 
+.point-detail-image {
+  width: 100%;
+  max-width: 140px;     /* ← 半分くらいの体感サイズ */
+  margin: 8px auto;
+  display: block;
+  border-radius: 8px;
+}
+
 .point-detail-text {
   line-height: 1.5;
 }
@@ -672,7 +613,10 @@ stroke-linejoin="round"
 
 <div id="milestoneMessage" class="milestone-message"></div>
 
-<div id="pointDetail" class="hidden"></div>
+<div
+  id="pointDetail"
+  class="milestone-message hidden"
+></div>
 
 
 <!-- 道後温泉：スタート -->
@@ -768,18 +712,7 @@ const points = [
 
 const POINTS_WITH_IMAGE = [
   "マッテルモン",
-  "カッパの石像",
-  "おポンプ様",
-  "白狐の湯田温泉足湯",
-  "和尚鯰",
-  "ズッコケ三人組モニュメント",
-  "ありがとう像",
-  "義士あんどん（からくり時計）",
-  "立木音楽堂（カフェ）",
-  "しらさぎ運動公園",
-  "鳥羽水族館（ラッコのメイちゃん）",
-  "イチョウ並木（大台町小滝）",
-  "翠波橋"
+  "カッパの石像"
 ];
 
 
@@ -802,119 +735,8 @@ const POINT_DETAILS = {
       思わず力が抜ける、旅の途中の小さな出来事です。
     `,
     autoClose: null
-  },
-
-  "おポンプ様": {
-    title: "おポンプ様",
-    img: "oponpu.png",
-    text: `
-      不思議な存在に見守られながら。<br>
-      今日も淡々と、でも確実に。
-    `,
-    autoClose: null
-  },
-
-  "白狐の湯田温泉足湯": {
-    title: "白狐の湯田温泉足湯",
-    img: "shirofox.png",
-    text: `
-      足湯に腰を下ろすイメージで。<br>
-      今日の疲れが、少しずつ抜けていきます。
-    `,
-    autoClose: null
-  },
-
-  "和尚鯰": {
-    title: "和尚鯰",
-    img: "namazu.png",
-    text: `
-      思わず二度見してしまう存在。<br>
-      旅には、こんな出会いもあります。
-    `,
-    autoClose: null
-  },
-
-  "ズッコケ三人組モニュメント": {
-    title: "ズッコケ三人組モニュメント",
-    img: "zukkoke.png",
-    text: `
-      懐かしい気配に、思わず口元が緩みます。<br>
-      少し軽やかな一日です。
-    `,
-    autoClose: null
-  },
-
-  "ありがとう像": {
-    title: "ありがとう像",
-    img: "arigato.png",
-    text: `
-      短い言葉に、少し背中を押されます。<br>
-      今日も一歩ずつ。
-    `,
-    autoClose: null
-  },
-
-  "義士あんどん（からくり時計）": {
-    title: "義士あんどん（からくり時計）",
-    img: "gishi.png",
-    text: `
-      時間になると動き出す、からくり時計。<br>
-      忠臣蔵の町らしい、静かな遊び心に出会います。
-    `,
-    autoClose: null
-  },
-
-  "立木音楽堂（カフェ）": {
-    title: "立木音楽堂（カフェ）",
-    img: "tachiki.png",
-    text: `
-      音楽堂という名前の、静かなカフェ。<br>
-      ひと息つくだけで、気分が少し整います。
-    `,
-    autoClose: null
-  },
-
-  "しらさぎ運動公園": {
-    title: "しらさぎ運動公園",
-    img: "karakuri.png",
-    text: `
-      からくり時計を横目に。<br>
-      今日も堅実にポイント通過。
-    `,
-    autoClose: null
-  },
-
-  "鳥羽水族館（ラッコのメイちゃん）": {
-    title: "鳥羽水族館（ラッコのメイちゃん）",
-    img: "may.png",
-    text: `
-      人気者に、ちょっと元気をもらって。<br>
-      旅は、まだ続きます。
-    `,
-    autoClose: null
-  },
-
-  "イチョウ並木（大台町小滝）": {
-    title: "イチョウ並木（大台町小滝）",
-    img: "icyo.png",
-    text: `
-      まっすぐに続く並木道。<br>
-      歩くリズムと、景色が重なります。
-    `,
-    autoClose: null
-  },
-
-  "翠波橋": {
-    title: "翠波橋",
-    img: "suiha.png",
-    text: `
-      橋の上で深呼吸。<br>
-      川の流れが、歩き続けた時間を映しています。
-    `,
-    autoClose: null
   }
 };
-
 
 
 
@@ -1126,31 +948,27 @@ if (!milestones[0]._el) return;
     }
   });
 
-// ===== event message =====
-events.forEach(e => {
-  if (e._shown) return;
+  // ===== event message =====
+  events.forEach(e => {
+    if (e._shown) return;
 
-  if (total > 0 && total >= e.distanceKm) {
-    const lines = Array.isArray(e.message) ? e.message : [e.message];
+    if (total > 0 && total >= e.distanceKm) {
+      const lines = Array.isArray(e.message) ? e.message : [e.message];
 
-    box.innerHTML = `
-      <strong>${e.point}</strong><br>
-      ${lines.join("<br>")}
-    `;
+      box.innerHTML = `
+        <strong>${e.point}</strong><br>
+        ${lines.join("<br>")}
+      `;
 
-    box.classList.add("show");
+      box.classList.add("show");
 
-    // ★ 既存タイマーを必ず止める
-    clearTimeout(box._eventTimer);
+      setTimeout(() => {
+        box.classList.remove("show");
+      }, 12000);
 
-    // ★ 表示時間（ここだけ触ればOK）
-    box._eventTimer = setTimeout(() => {
-      box.classList.remove("show");
-    }, 9000);   // ← 好きな秒数にしてOK
-
-    e._shown = true;
-  }
-});
+      e._shown = true;
+    }
+  });
 
 
 // ===== 赤ピン 到達判定（kmベース） =====
