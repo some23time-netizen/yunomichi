@@ -317,7 +317,7 @@
 "routeNo": 27,
 "area": "広島",
 "distanceKm": 500,
-"point": "鼻繰り島（厳島神社を望む）",
+"point": "厳島神社周辺",
 "trigger": "water",
 "category": "風景",
 "message": [
@@ -665,7 +665,7 @@
 "routeNo": 56,
 "area": "志摩",
 "distanceKm": 1060,
-"point": "鳥羽水族館（ラッコのメイちゃん）",
+"point": "鳥羽水族館",
 "trigger": "water",
 "category": "通過",
 "message": [
