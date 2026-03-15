@@ -12,33 +12,30 @@
 body {
   font-family: sans-serif;
   margin: 0;
-  padding: 8px;   /* ← 20px が犯人。まず減らす */
+  padding: 8px;
 }
 
 
 h1 {
-  margin: 4px 0 8px 0;   /* 上下の余白をかなり削減 */
-  font-size: 20px;      /* 大きすぎない */
+  margin: 4px 0 8px 0; 
+  font-size: 20px; 
   text-align: center;
 }
 
 
 .title {
   text-align: center;
-  margin: 2px 0 4px;   /* ← ほぼ最小 */
+  margin: 2px 0 4px; 
 }
 
 
 .title img {
-  display: block;        /* ← ここが最重要（inline-block は使わない） */
-  margin: 0 auto;        /* 中央寄せ */
+  display: block; 
+  margin: 0 auto; 
   max-width: 200px;
   width: 100%;
   height: auto;
 }
-
-
-
 
 /* ===== マップ ===== */
 .map-wrapper {
@@ -120,9 +117,6 @@ opacity: 1;
 display: none;
 }
 
-
-
-
 /* 復元ボタンは控えめ表示 */
 #loadBtn {
   font-size: 12px;
@@ -190,11 +184,11 @@ cursor: pointer;
 }
 
 .history-date .date-main {
-  font-size: 16px;      /* ← 主役：2月4日 */
+  font-size: 16px;
 }
 
 .history-date .date-sub {
-  font-size: 11px;      /* ← 脇役：年・時刻 */
+  font-size: 11px;
   color: #666;
 }
 
@@ -223,8 +217,8 @@ cursor: pointer;
   position: absolute;
   top: 70%;
 
-  left: 12px;      /* ← 左側に表示 */
-  right: auto;     /* ← 右指定を無効化 */
+  left: 12px; 
+  right: auto;
 
   background: #ffe6ee;
   padding: 14px 18px;
@@ -244,11 +238,11 @@ cursor: pointer;
 
 
 .milestone-message {
-  pointer-events: none;   /* ← 非表示時はクリックを邪魔しない */
+  pointer-events: none; 
 }
 
 .milestone-message.show {
-  pointer-events: auto;   /* ← 表示中だけ操作可能 */
+  pointer-events: auto; 
 }
 
 
@@ -257,10 +251,9 @@ cursor: pointer;
 }
 
 #pointDetail {
-  position: absolute;          /* ← fixed をやめる */
+  position: fixed;
   left: 50%;
-  transform: translateX(-50%); /* ← 縦はJSで制御 */
-
+  transform: translateX(-50%);
   width: 94%;
   max-width: 360px;
 
@@ -273,14 +266,14 @@ cursor: pointer;
   font-size: 14px;
   line-height: 1.6;
   text-align: left;
-
-  z-index: 1000;
+  z-index: 2000; 
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 #pointDetail.show {
-  opacity: 1;
+  display:block;
+  opacity:1;
 }
 
 
@@ -316,7 +309,7 @@ cursor: pointer;
 #pointDetail .point-detail-image {
   display: block;
   width: 100%;
-  max-width: 140px;        /* ← マッテルモン基準 */
+  max-width: 140px; 
   margin: 8px auto;
   border-radius: 10px;
 }
@@ -338,10 +331,10 @@ cursor: pointer;
   }
 
   .map-wrapper {
-    width: 100vw;                 /* 画面幅いっぱい */
-    max-width: none;              /* PC用制限を解除 */
+    width: 100vw; 
+    max-width: none;
     margin-left: 50%;
-    transform: translateX(-50%);  /* 完全中央寄せ */
+    transform: translateX(-50%);
   }
 
   /* ===== 操作ボタン行 ===== */
@@ -377,7 +370,7 @@ cursor: pointer;
     font-size: 14px;
     padding: 6px 10px;
     color: #000;
-    background: #f5f5f5;   /* 薄いグレー */
+    background: #f5f5f5;
     border: 1px solid #999;
     border-radius: 6px;
     white-space: nowrap;
@@ -476,9 +469,6 @@ cursor: pointer;
 
 
 }  /* ← ★ @media はここで終了 */
-
-
-
 
 
 
@@ -608,7 +598,7 @@ cursor: pointer;
 }
 
 #firstHelpCard {
-  position: absolute;
+  position: fixed;
   left: 50%;
   transform: translateX(-50%);
   width: 94%;
@@ -619,13 +609,14 @@ cursor: pointer;
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
   font-size: 14px;
   line-height: 1.6;
-  z-index: 1000;
+  z-index: 2000;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 #firstHelpCard.show {
-  opacity: 1;
+  display:block;
+  opacity:1;
 }
 
 
@@ -699,10 +690,6 @@ stroke-linejoin="round"
 
 <div id="milestoneMessage" class="milestone-message"></div>
 
-<div id="pointDetail" class="hidden"></div>
-<div id="firstHelpCard" class="hidden"></div>
-
-
 <!-- 道後温泉：スタート -->
 <img src="onsen.png"
 class="pin pin-start"
@@ -715,6 +702,9 @@ style="left:33.30%; top:56.55%;">
 
 </div>
 
+<div id="pointDetail" class="hidden"></div>
+<div id="firstHelpCard" class="hidden"></div>
+
 <div class="controls">
 
   <div class="controls-row">
@@ -726,7 +716,7 @@ style="left:33.30%; top:56.55%;">
         placeholder="歩いた距離km"
       >
       <button id="addBtn">追加</button>
-      <span class="controls-spacer"></span> <!-- ★追加 -->
+      <span class="controls-spacer"></span> 
     </div>
   </div>
 
@@ -772,7 +762,6 @@ style="left:33.30%; top:56.55%;">
 
 </div>
 
-<!-- ★ 見えないけど必須。どこでもいいので body 内に残す -->
 <input type="file" id="loadInput" accept=".json" style="display:none">
 
 <script src="pointDetails.js"></script>
@@ -882,6 +871,8 @@ const POINTS_WITH_IMAGE = new Set([
 
 const GOAL_KM = 1619.5;
 
+
+
 const routeSegments = [
   // 道後 → 佐賀関港
   { kmStart: 0,    kmEnd: 80,   ratioStart: 0.00, ratioEnd: 0.06 },
@@ -944,7 +935,6 @@ function kmToRatio(actualKm) {
   return seg.ratioStart +
     (seg.ratioEnd - seg.ratioStart) * progress;
 }
-
 
 
 function updateRoute() {
@@ -1030,7 +1020,6 @@ ${rowPassed.map(name => {
 `;
 
 
-
 tbody.appendChild(tr);
 total -= h.km;
 });
@@ -1041,7 +1030,7 @@ btn.addEventListener("click", () => {
 const i = Number(btn.dataset.index);
 history.splice(i, 1);
 save();
-events.forEach(e => e._shown = false); // ← ★ これを追加
+events.forEach(e => e._shown = false);
 updateRoute();
 updateGoalPin();
 renderHistory();
@@ -1049,14 +1038,7 @@ updateEvents();
 });
 });
 
-// 📷 通過ポイント（画像あり）クリック処理 ← ★ここ！
-tbody.querySelectorAll(".passed-point").forEach(span => {
-  span.addEventListener("click", (e) => {
-    e.stopPropagation();        // ← 絶対必要
-    const name = span.dataset.point;
-    showPointDetail(name, span);
-  });
-});
+
 
 } // ← renderHistory() 終了
 
@@ -1074,7 +1056,7 @@ function createMilestones() {
 
     mapWrapper.appendChild(img);
 
-    m._el = img; // ★ 後続処理で必須
+    m._el = img;
   });
 }
 
@@ -1192,8 +1174,8 @@ points.forEach(p => {
 
   if (p.icon === "pin.png") {
     img.classList.add("pin-small", "is-not-reached");
-    img.dataset.label = p.name;   // 案内用
-    img.dataset.km = p.km ?? "";  // 距離（あれば）
+    img.dataset.label = p.name;
+    img.dataset.km = p.km ?? "";
     img.tabIndex = 0;
   } else {
     img.classList.add("pin-large");
@@ -1203,7 +1185,7 @@ points.forEach(p => {
   img.style.top = p.y + "%";
   mapWrapper.appendChild(img);
 
-  p._el = img; // 後で制御するため保持
+  p._el = img;
 });
 
 
@@ -1216,7 +1198,7 @@ fetch("events.json")
     events = data.events || [];
     events.forEach(e => e._shown = false);
 
-    renderHistory();   // ← ★ 追加
+    renderHistory();
   });
 
 
@@ -1233,7 +1215,7 @@ fetch("milestones.json")
       m._el.classList.remove("active");
     });
 
-    updateEvents(); // ★ 初期表示で必ず一度反映
+    updateEvents();
   });
 
 
@@ -1251,7 +1233,7 @@ function calculatePassedPointsPerRow(history, passingPoints) {
     prevTotal < p.km &&
     total >= p.km
   )
-  .sort((a, b) => a.km - b.km) // ★ 追加：距離順保証
+  .sort((a, b) => a.km - b.km)
   .map(p => p.name);
 
     result.push(passedHere);
@@ -1449,7 +1431,7 @@ document.addEventListener("click", (e) => {
   if (box.contains(e.target)) return;
 
   hidePointDetail();
-}, true); // ← ★ capture フェーズで処理
+}, true);
 
 
 document.getElementById("firstHelpBtn").addEventListener("click", () => {
@@ -1485,8 +1467,7 @@ URLをコピーして<br>
 </div>
 `;
 
-box.style.top =
-`${window.pageYOffset + window.innerHeight / 2}px`;
+box.style.top = "80px";
 
 box.classList.remove("hidden");
 box.classList.add("show");
