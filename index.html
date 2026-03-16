@@ -7,7 +7,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>湯の道巡礼｜1619.5kmの旅</title>
 
-
 <style>
 body {
   font-family: sans-serif;
@@ -36,6 +35,17 @@ h1 {
   width: 100%;
   height: auto;
 }
+
+.remain-km{
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  color:#b8860b;
+  letter-spacing:1px;
+  margin-bottom:10px;
+}
+
+
 
 /* ===== マップ ===== */
 .map-wrapper {
@@ -250,12 +260,18 @@ cursor: pointer;
   opacity: 1;
 }
 
+
 #pointDetail {
   position: fixed;
   left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
+
   width: 94%;
   max-width: 360px;
+
+  max-height: 80vh;
+  overflow-y: auto;
 
   background: #ffe6ee;
   padding: 16px;
@@ -266,10 +282,11 @@ cursor: pointer;
   font-size: 14px;
   line-height: 1.6;
   text-align: left;
-  z-index: 2000; 
+  z-index: 2000;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
+
 
 #pointDetail.show {
   display:block;
@@ -278,12 +295,6 @@ cursor: pointer;
 
 
 /* ===== 📱 スマホだけ挙動を切り替える ===== */
-@media (max-width: 600px) {
-  #pointDetail {
-    position: absolute;
-    transform: translate(-50%, -50%);
-  }
-}
 
 /* ヘッダー（タイトル＋×） */
 #pointDetail .point-detail-header {
@@ -620,6 +631,132 @@ cursor: pointer;
 }
 
 
+
+/* ===== ゴール演出 ===== */
+
+.goal-animate {
+  animation: goalPop 0.8s ease-out;
+}
+
+@keyframes goalPop {
+  0% {
+    transform: translate(-50%, -100%) scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: translate(-50%, -100%) scale(1.3);
+  }
+  100% {
+    transform: translate(-50%, -100%) scale(1);
+    opacity: 1;
+  }
+}
+
+#certificateCard{
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 94%;
+  max-width: 360px;
+
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+
+  z-index: 3000;
+  text-align: center;
+
+  overflow: visible; 
+}
+
+.certificate{
+  position: relative;
+  display: inline-block;
+  overflow: visible; 
+
+  padding:24px;
+  background:#fff;
+
+transform: scale(0.98); 
+}
+
+.cert-bg{
+  width: 100%;
+  border-radius: 10px;
+}
+
+.cert-text{
+  position:absolute;
+
+  bottom:120px; 
+  right:40px; 
+
+  width:90px;      /* 白背景を狭く */
+  
+  text-align:center;
+  color:#000;
+  font-weight:bold;
+
+  background:rgba(255,255,255,0.88);
+  padding:6px 8px; /* 背景も少し縮める */
+  border-radius:6px;
+
+  z-index:10;
+}
+
+.cert-face{
+  position:absolute;
+  top:110px;
+  left:50%;
+  transform:translateX(-50%);
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.cert-runner{
+  position:absolute;
+  bottom:-5px;
+  left:35%;
+  transform:translateX(-50%);
+  width:200px;
+}
+
+.cert-frame{
+  position:absolute;
+  left:-24px;
+  top:-16px;
+  width:calc(100% + 48px);
+  height:calc(100% + 48px);
+  pointer-events:none;
+}
+
+.goal-row{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+.cert-title{
+  font-size:13px;
+}
+
+.cert-km{
+  font-size:15px;
+  font-weight:bold; /* ←ここだけ太字 */
+}
+
+.cert-date{
+  font-size:11px;
+}
+
+
 </style>
 </head>
 
@@ -629,6 +766,15 @@ cursor: pointer;
   <img src="title.png" alt="湯の道巡礼 1619.5kmの旅">
 </div>
 
+<div class="goal-row">
+
+  <div id="remainKm" class="remain-km"></div>
+
+  <button id="showCertBtn" style="display:none;">
+  🏅 完歩証
+  </button>
+
+</div>
 
 <div class="map-wrapper">
 
@@ -704,6 +850,7 @@ style="left:33.30%; top:56.55%;">
 
 <div id="pointDetail" class="hidden"></div>
 <div id="firstHelpCard" class="hidden"></div>
+<div id="certificateCard" class="hidden"></div>
 
 <div class="controls">
 
@@ -765,6 +912,10 @@ style="left:33.30%; top:56.55%;">
 <input type="file" id="loadInput" accept=".json" style="display:none">
 
 <script src="pointDetails.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
 
@@ -908,6 +1059,12 @@ const routeSegments = [
 const STORAGE_KEY = "yunomichi_history";
 
 const inputKm = document.getElementById("inputKm");
+inputKm.addEventListener("keypress", e => {
+  if (e.key === "Enter") {
+    document.getElementById("addBtn").click();
+  }
+});
+
 const historyList = document.getElementById("historyList");
 const progressPath = document.getElementById("progressPath");
 
@@ -949,17 +1106,54 @@ function updateRoute() {
 }
 
 
-function updateGoalPin() {
-if (totalKm() >= GOAL_KM) {
-startPin.classList.add("hidden");
-goalPin.classList.remove("hidden");
-goalPin.classList.add("reached");
-} else {
-startPin.classList.remove("hidden");
-goalPin.classList.add("hidden");
-}
+function updateRemainKm(){
+
+  const remain = Math.max(0, GOAL_KM - totalKm());
+
+  const el = document.getElementById("remainKm");
+
+  if(!el) return;
+
+  if(remain === 0){
+    el.textContent = "ゴール到達";
+  }else{
+    el.textContent = "ゴールまであと " + remain.toFixed(1) + " km";
+  }
+
 }
 
+
+
+
+
+
+function updateGoalPin() {
+
+  if (totalKm() >= GOAL_KM) {
+
+    startPin.classList.add("hidden");
+
+    goalPin.classList.remove("hidden");
+    goalPin.classList.add("reached");
+    goalPin.classList.add("goal-animate");
+
+	confetti({
+	  particleCount: 120,
+	  spread: 80,
+	  origin: { y: 0.6 }
+	});
+document.getElementById("showCertBtn").style.display = "inline-block";
+
+  }
+
+  else {
+
+    startPin.classList.remove("hidden");
+    goalPin.classList.add("hidden");
+
+  }
+
+}
 
 function renderHistory() {
 const tbody = document.querySelector("#historyTable tbody");
@@ -1035,6 +1229,7 @@ updateRoute();
 updateGoalPin();
 renderHistory();
 updateEvents();
+updateRemainKm();
 });
 });
 
@@ -1162,6 +1357,7 @@ updateRoute();
 updateGoalPin();
 renderHistory();
 updateEvents();
+updateRemainKm();
 inputKm.value = "";
 });
 
@@ -1330,6 +1526,8 @@ document.getElementById("loadInput").addEventListener("change", e => {
       updateGoalPin();
       renderHistory();
       updateEvents();
+      updateRemainKm();
+      
 
       alert("復元しました");
     } catch {
@@ -1365,7 +1563,7 @@ document.querySelectorAll(".help-btn").forEach(btn => {
 
 updateRoute();
 updateGoalPin();
-
+updateRemainKm();
 
 function showPointDetail(pointName) {
   const box = document.getElementById("pointDetail");
@@ -1387,8 +1585,6 @@ function showPointDetail(pointName) {
   `;
 
   // ===== 表示位置（常に今の画面中央）=====
-  box.style.left = "50%";
-  box.style.top  = `${window.pageYOffset + window.innerHeight / 2}px`;
 
   box.classList.remove("hidden");
   box.classList.add("show");
@@ -1501,7 +1697,72 @@ document.addEventListener("click", (e) => {
   }
 });
 
+
+document.getElementById("showCertBtn").addEventListener("click", () => {
+
+  const box = document.getElementById("certificateCard");
+
+ box.innerHTML = `
+
+<div class="point-detail-header">
+<strong>湯の道巡礼 完歩証</strong>
+
+<div>
+<button id="saveCertImg">保存</button>
+<button class="point-detail-close">×</button>
+</div>
+
+</div>
+
+<div class="certificate">
+
+  <img src="honkan.png" class="cert-bg">
+
+  <div class="cert-text">
+    <div class="cert-title">完歩証</div>
+    <div class="cert-km">1619.5km</div>
+    <div class="cert-date">${new Date().toLocaleDateString()}</div>
+  </div>
+
+  <img src="kaonuki.png" class="cert-runner">
+  <img id="certFace" class="cert-face">
+
+  <img src="certificate_frame.png" class="cert-frame">
+
+</div>
+
+`;
+
+box.classList.remove("hidden");
+
+box.querySelector(".point-detail-close")
+   .addEventListener("click", () => {
+     box.classList.add("hidden");
+   });
+
+box.querySelector("#saveCertImg")
+   .addEventListener("click", () => {
+
+  const target = box.querySelector(".certificate");
+
+  html2canvas(target,{
+    scale:3,
+    useCORS:true
+  }).then(canvas => {
+
+    const link = document.createElement("a");
+    link.download = "yunomichi_certificate.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+
+  });
+
+});
+
+});
+
 </script>
+
 
 </body>
 </html>
