@@ -711,14 +711,39 @@ transform: translateX(0.5px);
 
 .cert-face{
   position:absolute;
-  top:110px;
-  left:50%;
-  transform:translateX(-50%);
+  top:68px;
+  left:88px;
+  transform:none;
   width:70px;
   height:70px;
   border-radius:50%;
   object-fit:cover;
+  cursor:pointer;
+  background:#eee;
+  z-index:10; /* ←追加 */
 }
+
+.cert-face-label{
+  position:absolute;
+  top:68px;
+  left:88px;
+  width:70px;
+  height:70px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:11px;
+  color:#333;
+  background:rgba(255,255,255,0.7);
+  border-radius:50%;
+
+  pointer-events:none;
+  z-index:10; /* ←追加 */
+}
+
+
 
 .cert-runner{
   position:absolute;
@@ -916,6 +941,8 @@ style="left:33.30%; top:56.55%;">
 </div>
 
 <input type="file" id="loadInput" accept=".json" style="display:none">
+
+<input type="file" id="faceInput" accept="image/*" style="display:none">
 
 <script src="pointDetails.js"></script>
 
@@ -1713,11 +1740,15 @@ document.addEventListener("click", (e) => {
 
 document.getElementById("showCertBtn").addEventListener("click", () => {
 
+  // ★ここに入れる（検証用リセット）
+  // ★ localStorage.removeItem("cert_face");
+
   const box = document.getElementById("certificateCard");
   const now = new Date();
   const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
 
  box.innerHTML = `
+
 
 <div class="point-detail-header">
 <strong>湯の道巡礼 完歩証</strong>
@@ -1741,14 +1772,54 @@ document.getElementById("showCertBtn").addEventListener("click", () => {
 
   <img src="kaonuki.png" class="cert-runner">
   <img id="certFace" class="cert-face">
-
+  <div id="faceLabel" class="cert-face-label">📷顔を設定</div>
   <img src="certificate_frame.png" class="cert-frame">
 
 </div>
 
 `;
 
+
 box.classList.remove("hidden");
+
+// ★ここから追加（この位置だけ）
+const faceImg = box.querySelector("#certFace");
+const faceInput = document.getElementById("faceInput");
+
+// 保存されている顔を復元
+const savedFace = localStorage.getItem("cert_face");
+if (savedFace) {
+  faceImg.src = savedFace;
+
+  box.querySelector("#faceLabel")?.remove(); // ←これに変更
+}
+
+// 顔クリック → ファイル選択
+faceImg.addEventListener("click", () => {
+  faceInput.value = "";
+  faceInput.click();
+});
+
+// 選択した画像を表示＋保存
+faceInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const dataUrl = reader.result;
+
+    faceImg.src = dataUrl;
+    localStorage.setItem("cert_face", dataUrl);
+
+    // ラベル削除（ここに移動が正しい）
+    box.querySelector("#faceLabel")?.remove();
+  };
+
+  reader.readAsDataURL(file); // ←これ必須
+});
+
 
 box.querySelector(".point-detail-close")
    .addEventListener("click", () => {
