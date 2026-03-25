@@ -713,12 +713,17 @@ transform: translateX(0.5px);
   position:absolute;
   top:68px;
   left:88px;
-  transform:none;
+
   width:70px;
   height:70px;
+  aspect-ratio: 1 / 1;
+
   border-radius:50%;
+  overflow:hidden;
+
   object-fit:cover;
-  object-position: center;  /* ← これ追加 */
+  object-position: center;
+
   cursor:pointer;
   background:#eee;
   z-index:10;
