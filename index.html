@@ -1814,8 +1814,13 @@ const faceInput = document.getElementById("faceInput");
 
 // 保存されている顔を復元
 const savedFace = localStorage.getItem("cert_face");
+
 if (savedFace) {
   faceImg.style.backgroundImage = `url(${savedFace})`;
+
+  // ★ ここ追加（重要）
+  faceImg.style.backgroundSize = "cover";
+  faceImg.style.backgroundPosition = "center";
 
   box.querySelector("#faceLabel")?.remove();
 }
