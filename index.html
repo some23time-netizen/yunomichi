@@ -1838,8 +1838,30 @@ faceInput.onchange = e => {
 
   const reader = new FileReader();
 
-  reader.onload = () => {
-    const dataUrl = reader.result;
+reader.onload = () => {
+  const img = new Image();
+
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const size = 200; // ←ここがポイント（サイズ縮小）
+
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext("2d");
+
+    // 中央を切り抜く
+    const minSide = Math.min(img.width, img.height);
+    const sx = (img.width - minSide) / 2;
+    const sy = (img.height - minSide) / 2;
+
+    ctx.drawImage(
+      img,
+      sx, sy, minSide, minSide,
+      0, 0, size, size
+    );
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
 
     faceImg.style.backgroundImage = `url(${dataUrl})`;
     localStorage.setItem("cert_face", dataUrl);
@@ -1847,6 +1869,8 @@ faceInput.onchange = e => {
     box.querySelector("#faceLabel")?.remove();
   };
 
+  img.src = reader.result;
+};
   reader.readAsDataURL(file);
 };
 
